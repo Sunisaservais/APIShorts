@@ -3,14 +3,16 @@ package com.cydeo.apiTests;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import static io.restassured.RestAssured.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class P03_QueryParamTest {
 
     /*
-    Given accept type is JSON
+    Given accepts type is JSON
     And Query Parameter values are
     gender | Female
     nameContains | J
@@ -22,34 +24,25 @@ public class P03_QueryParamTest {
      */
 
     @BeforeAll
-    public static void init(){
+    public static void init() {
 
-        RestAssured.baseURI= "http://34.226.136.145:8000";
+        RestAssured.baseURI = "http://34.226.136.145:8000";
     }
 
     @Test
     public void queryParamTest() {
-        Response response = RestAssured.given().accept(ContentType.JSON)
+        Response response = given()
+                .accept(ContentType.JSON)
+                .and()
+                .queryParam("gender", "Female")
                 .queryParam("nameContains", "J")
-                .queryParam("gender", "Female").
-                when().get("/api/spartans/search");
-
-
-        //    Then response status code should be 200
-        Assertions.assertEquals(200,response.statusCode());
-
-        //    And response content type is application JSON
-        Assertions.assertEquals(ContentType.JSON.toString(),response.contentType());
-
-        //    And "Female" should be in response
-        Assertions.assertTrue(response.asString().contains("Female"));
-
-        //    And "Janette" should be in response
-        Assertions.assertTrue(response.asString().contains("Janette"));
-
+                .when()
+                .get("/api/spartans/search");
         response.prettyPrint();
-
-
+        assertEquals(200, response.getStatusCode());
+        assertEquals(ContentType.JSON.toString(), response.contentType());
+        assertTrue(response.getBody().asString().contains("Female"));
+        assertTrue(response.getBody().asString().contains("Janette"));
 
     }
 }

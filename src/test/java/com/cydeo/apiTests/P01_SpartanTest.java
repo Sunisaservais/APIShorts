@@ -14,7 +14,6 @@ public class P01_SpartanTest {
 
         Response response = RestAssured.get(spartanBaseURL + "/api/spartans");
 
-
         //Status CODE
         int statusCode = response.statusCode();
         System.out.println("statusCode = " + statusCode);
@@ -25,8 +24,6 @@ public class P01_SpartanTest {
         String contentType = response.contentType();
         System.out.println("contentType = " + contentType);
 
-
-
         Assertions.assertEquals("application/json",contentType);
 
         // Print BODY
@@ -35,7 +32,5 @@ public class P01_SpartanTest {
 
         System.out.println("***** RESPONSE PRETTY PRINT ********");
         System.out.println(response.prettyPrint());
-
-
     }
 }
