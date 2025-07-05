@@ -1,11 +1,14 @@
 package com.cydeo.apiTests;
 
 import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static io.restassured.RestAssured.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,87 +29,41 @@ public class P04_PathMethod {
      */
 
     @BeforeAll
-    public static void init(){
-
-        baseURI= "http://34.226.136.145:8000";
+    public static void init() {
+        baseURI = "http://cydeo.onthewifi.com:8000";
     }
+        @DisplayName("Path Method")
+        @Test
+        public void pathMethod() {
+            Response response = given()
+                    .accept(ContentType.JSON)
+                    .and()
+                    .pathParam("id", 3)
+                    .when()
+                    .get("/api/v2/spartans/{id}");
 
-    @Test
-    public void pathMethod() {
+            response.prettyPrint();
 
-        Response response = given().accept(ContentType.JSON)
-                .pathParam("id", 2277).
-                when().get("/api/spartans/{id}");
 
-        response.prettyPrint();
+            assertEquals(200, response.getStatusCode());
+            assertEquals(ContentType.JSON.toString(), response.contentType());
 
-        //    Then response status code should be 200
-        assertEquals(200,response.statusCode());
+            JsonPath jsonPath = response.jsonPath();
 
-        //    And response content type is application/json
-        assertEquals(ContentType.JSON.toString(),response.contentType());
+            int id = jsonPath.getInt("data.id");
+            assertEquals(3, id);
 
-        //    And response payload/body values are
-        /*
-            {
-                "id": 2277,
-                "name": "Fidole",
-                "gender": "Male",
-                "phone": 6105035231
-            }
-         */
-        //         id is 3
-        int id=response.path("id");
-        System.out.println("id = " + id);
-        assertEquals(2277,id);
+            String name = jsonPath.getString("data.name");
+            assertEquals("Fidole", name);
 
-        //         name is "Fidole"
-        String name=response.path("name");
-        System.out.println("name = " + name);
-        assertEquals("Fidole",name);
+            String gender = jsonPath.getString("data.gender");
+            assertEquals("Male", gender);
 
-        //         gender is "Male"
-        String gender=response.path("gender");
-        System.out.println("gender = " + gender);
-        assertEquals("Male",gender);
-
-        //         phone is 6105035231
-       long phone= response.path("phone");
-        System.out.println("phone = " + phone);
-        assertEquals(6105035231l,phone);
+            String phoneStr = jsonPath.getString("data.phone");
+            long phone = Long.parseLong(phoneStr);
+            assertEquals(6105035231L, phone);
+        }
 
 
     }
 
-    @Test
-    public void getAllSpartans() {
-
-        Response response = get("/api/spartans");
-
-        response.prettyPrint();
-
-
-        // Get me first spartan ID
-        System.out.println("response.path(\"id[0]\") = " + response.path("id[0]"));
-
-        //Get me second spartan name
-        System.out.println("response.path(\"name[1]\") = " + response.path("name[1]"));
-
-        //Get me last spartan name
-        System.out.println("response.path(\"name[-1]\") = " + response.path("name[-1]"));
-
-        //Get me all spartan names
-
-       List<String> allNames= response.path("name");
-        System.out.println("***** NAMES *****");
-        System.out.println(allNames);
-
-
-        //Get me all spartan IDs
-        System.out.println("***** IDs *****");
-        List<Integer> allIDs=response.path("id");
-        System.out.println(allIDs);
-
-
-    }
-}
